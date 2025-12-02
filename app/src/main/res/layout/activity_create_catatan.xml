@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".CreateCatatan">
+
+    <!-- 1. Judul Halaman -->
+    <TextView
+        android:id="@+id/tvJudulHalaman"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Buat Catatan Baru"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- 2. Input Judul Catatan -->
+    <EditText
+        android:id="@+id/inputJudul"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Isi judul catatan"
+        android:inputType="textCapSentences"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvJudulHalaman" />
+
+    <!-- 3. Input Isi Catatan -->
+    <!-- Menggunakan gravity top agar teks mulai dari atas, dan minHeight agar kotak terlihat besar -->
+    <EditText
+        android:id="@+id/inputIsi"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:hint="Tulis isi catatan di sini..."
+        android:gravity="top|start"
+        android:inputType="textMultiLine"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@android:drawable/edit_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inputJudul"
+        app:layout_constraintBottom_toTopOf="@+id/tombolSimpan"/>
+
+    <!-- 4. Button Simpan -->
+    <Button
+        android:id="@+id/tombolSimpan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Simpan"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
