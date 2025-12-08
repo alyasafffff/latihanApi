@@ -19,16 +19,17 @@ class CreateCatatan : AppCompatActivity() {
     private lateinit var binding : ActivityCreateCatatanBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         binding = ActivityCreateCatatanBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(binding.root) // <--- CUKUP INI SAJA
 
-        setContentView(R.layout.activity_create_catatan)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        // HAPUS BARIS INI: setContentView(R.layout.activity_create_catatan)
+        // Baris di atas membuat tombol "Simpan" tidak bisa diklik.
+
+        // Ganti findViewById(R.id.main) menjadi binding.main
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -49,7 +50,8 @@ class CreateCatatan : AppCompatActivity() {
             val payload = Catatan(
                 judul = judul,
                 isi  = isi,
-                id = null
+                id = null,
+                user_id = 1
             )
 
             lifecycleScope.launch {
