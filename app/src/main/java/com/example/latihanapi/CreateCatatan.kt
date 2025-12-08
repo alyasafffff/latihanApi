@@ -56,7 +56,7 @@ class CreateCatatan : AppCompatActivity() {
 
             lifecycleScope.launch {
                 val response = RetrofitClient.catatanRepository.createCatatan(payload)
-                if (response.isSuccess){
+                if (response.isSuccessful){
                     displayMessage("Catatan Berhasil Di tambahkan")
 
                     val intent = Intent(this@CreateCatatan, MainActivity::class.java)
