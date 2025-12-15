@@ -3,7 +3,7 @@ package com.example.latihanapi.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.latihanapi.databinding.ListCatatanBinding // Pastikan import ini sesuai
+import com.example.latihanapi.databinding.ListCatatanBinding
 import com.example.latihanapi.entities.Catatan
 
 class CatatanAdapter(
@@ -11,26 +11,28 @@ class CatatanAdapter(
     private val events: CatatanItemEvents
 ): RecyclerView.Adapter<CatatanAdapter.CatatanViewHolder>() {
 
-    interface  CatatanItemEvents{
+    interface CatatanItemEvents{
         fun onEdit(catatan: Catatan)
     }
 
-    // Gunakan ListCatatanBinding sesuai nama file list_catatan.xml
     inner class CatatanViewHolder(val binding: ListCatatanBinding) : RecyclerView.ViewHolder(binding.root) {
         fun setDataKeUI(data: Catatan) {
             binding.tvJudul.text = data.judul
             binding.tvIsi.text = data.isi
+
+            // --- TAMBAHAN PENTING: Aksi Klik ---
+            itemView.setOnClickListener {
+                events.onEdit(data)
+            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CatatanViewHolder {
-        // Implementasi inflate layout
         val binding = ListCatatanBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return CatatanViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: CatatanViewHolder, position: Int) {
-        // Perbaikan: gunakan [] bukan ()
         val dataSekarang = dataset[position]
         holder.setDataKeUI(dataSekarang)
     }

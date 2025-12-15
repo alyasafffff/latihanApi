@@ -14,25 +14,26 @@ import kotlinx.coroutines.launch
 
 class EditCatatanActivity : AppCompatActivity() {
 
-    private  lateinit var  binding: ActivityEditCatatanBinding
+    private lateinit var binding: ActivityEditCatatanBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         binding = ActivityEditCatatanBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(binding.root) // CUKUP INI SAJA
 
-        setContentView(R.layout.activity_edit_catatan)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        // PERBAIKAN: Hapus baris di bawah ini karena merusak ViewBinding
+        // setContentView(R.layout.activity_edit_catatan)
+
+        // Ganti findViewById dengan binding.main
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-
         setupEvents()
-
     }
 
     override fun onStart() {
@@ -52,20 +53,27 @@ class EditCatatanActivity : AppCompatActivity() {
             }
 
             lifecycleScope.launch {
-                val catatan = Catatan(id, judul, isi)
-                val data = RetrofitClient.catatanRepository.editCatatan(id, catatan)
+                // PERBAIKAN: Menambahkan user_id (misal default 1) agar sesuai Data Class
+                val catatan = Catatan(id, judul, isi, 1)
 
-                if (data.isSuccessful){
-                    displayMessage("catatan berhasil di ubah")
-                    switchPage(MainActivity::class.java)
-                }else{
-                    displayMessage("Error: ${data.message()}")
+                // Pastikan menggunakan try-catch untuk handle error koneksi
+                try {
+                    val data = RetrofitClient.catatanRepository.editCatatan(id, catatan)
+                    if (data.isSuccessful){
+                        displayMessage("Catatan berhasil diubah")
+                        switchPage(MainActivity::class.java)
+                    } else {
+                        displayMessage("Error: ${data.message()}")
+                    }
+                } catch (e: Exception) {
+                    displayMessage("Jaringan Error: ${e.message}")
                 }
             }
         }
     }
-    fun  loadData(){
-        val id= intent.getIntExtra("id_catatan", 0)
+
+    fun loadData(){
+        val id = intent.getIntExtra("id_catatan", 0)
 
         if(id == 0){
             displayMessage("Error: id catatan tidak terkirim")
@@ -74,23 +82,26 @@ class EditCatatanActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            val data = RetrofitClient.catatanRepository.getCatatan(id)
-            if (data.isSuccessful){
-                val catatan = data.body()
-                binding.inputJudul.setText(catatan?.judul)
-                binding.inputIsi.setText(catatan?.isi)
-            }else{
-
+            try {
+                val data = RetrofitClient.catatanRepository.getCatatan(id)
+                if (data.isSuccessful){
+                    val catatan = data.body()
+                    binding.inputJudul.setText(catatan?.judul)
+                    binding.inputIsi.setText(catatan?.isi)
+                }
+            } catch (e: Exception) {
+                displayMessage("Gagal memuat data")
             }
         }
     }
+
     fun displayMessage(message: String){
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
-    fun switchPage(destination: Class<MainActivity>){
+
+    fun switchPage(destination: Class<*>){ // Ganti Class<MainActivity> jadi Class<*> biar lebih fleksibel
         val intent = Intent(this, destination)
         startActivity(intent)
         finish()
     }
-
 }

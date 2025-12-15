@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.latihanapi.adapter.CatatanAdapter
 import com.example.latihanapi.databinding.ActivityMainBinding
+import com.example.latihanapi.entities.Catatan
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -35,15 +36,21 @@ class MainActivity : AppCompatActivity() {
         setupEvents()
     }
 
-    // Supaya saat kembali dari halaman Create, data direfresh
     override fun onResume() {
         super.onResume()
         getDataCatatan()
     }
 
     private fun setupRecyclerView() {
-        // Inisialisasi adapter dengan list kosong dulu
-        catatanAdapter = CatatanAdapter(mutableListOf())
+        // PERBAIKAN: Menambahkan listener interface di sini
+        catatanAdapter = CatatanAdapter(mutableListOf(), object : CatatanAdapter.CatatanItemEvents {
+            override fun onEdit(catatan: Catatan) {
+                // Logika pindah ke halaman edit saat item diklik
+                val intent = Intent(this@MainActivity, EditCatatanActivity::class.java)
+                intent.putExtra("id_catatan", catatan.id)
+                startActivity(intent)
+            }
+        })
 
         binding.rvCatatan.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
@@ -61,7 +68,7 @@ class MainActivity : AppCompatActivity() {
                         catatanAdapter.updateDataset(data)
                     }
                 } else {
-                    Toast.makeText(this@MainActivity, "Gagal mengambil data: ${response.message()}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "Gagal: ${response.message()}", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
