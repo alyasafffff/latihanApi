@@ -6,7 +6,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.latihanapi.databinding.ListCatatanBinding // Pastikan import ini sesuai
 import com.example.latihanapi.entities.Catatan
 
-class CatatanAdapter(private val dataset: MutableList<Catatan>) : RecyclerView.Adapter<CatatanAdapter.CatatanViewHolder>() {
+class CatatanAdapter(
+    private val dataset: MutableList<Catatan>,
+    private val events: CatatanItemEvents
+): RecyclerView.Adapter<CatatanAdapter.CatatanViewHolder>() {
+
+    interface  CatatanItemEvents{
+        fun onEdit(catatan: Catatan)
+    }
 
     // Gunakan ListCatatanBinding sesuai nama file list_catatan.xml
     inner class CatatanViewHolder(val binding: ListCatatanBinding) : RecyclerView.ViewHolder(binding.root) {
