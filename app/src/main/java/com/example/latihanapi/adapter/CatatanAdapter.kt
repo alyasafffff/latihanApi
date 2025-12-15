@@ -13,6 +13,7 @@ class CatatanAdapter(
 
     interface CatatanItemEvents{
         fun onEdit(catatan: Catatan)
+        fun onDelete(catatan: Catatan) // <--- TAMBAHKAN INI
     }
 
     inner class CatatanViewHolder(val binding: ListCatatanBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -20,9 +21,15 @@ class CatatanAdapter(
             binding.tvJudul.text = data.judul
             binding.tvIsi.text = data.isi
 
-            // --- TAMBAHAN PENTING: Aksi Klik ---
+            // Klik biasa untuk Edit
             itemView.setOnClickListener {
                 events.onEdit(data)
+            }
+
+            // --- TAMBAHKAN INI: Klik Lama (Long Click) untuk Hapus ---
+            itemView.setOnLongClickListener {
+                events.onDelete(data)
+                true // return true agar tidak dianggap klik biasa setelahnya
             }
         }
     }

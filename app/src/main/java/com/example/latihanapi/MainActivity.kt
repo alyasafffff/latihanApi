@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog // <--- Pastikan import ini ada
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -42,19 +43,67 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        // PERBAIKAN: Menambahkan listener interface di sini
+        // Kita implementasikan kedua fungsi: onEdit dan onLongClick
         catatanAdapter = CatatanAdapter(mutableListOf(), object : CatatanAdapter.CatatanItemEvents {
+
+            // 1. Klik Biasa -> Pindah ke Edit
             override fun onEdit(catatan: Catatan) {
-                // Logika pindah ke halaman edit saat item diklik
                 val intent = Intent(this@MainActivity, EditCatatanActivity::class.java)
                 intent.putExtra("id_catatan", catatan.id)
                 startActivity(intent)
+            }
+
+            // 2. Klik Lama -> Muncul Pop-up Hapus
+            override fun onDelete(catatan: Catatan) {
+                showDeleteDialog(catatan)
             }
         })
 
         binding.rvCatatan.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = catatanAdapter
+        }
+    }
+
+    // Fungsi menampilkan Dialog Konfirmasi
+    private fun showDeleteDialog(catatan: Catatan) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Hapus Catatan")
+        builder.setMessage("Apakah Anda yakin ingin menghapus catatan '${catatan.judul}'?")
+
+        // Tombol Ya (Hapus)
+        builder.setPositiveButton("Ya") { dialog, _ ->
+            // Pastikan ID tidak null sebelum menghapus
+            catatan.id?.let { id ->
+                hapusCatatanKeServer(id)
+            }
+        }
+
+        // Tombol Tidak (Batal)
+        builder.setNegativeButton("Tidak") { dialog, _ ->
+            dialog.dismiss() // Tutup pop-up
+        }
+
+        // Tampilkan dialog
+        builder.show()
+    }
+
+    // Fungsi Hapus ke API
+    private fun hapusCatatanKeServer(id: Int) {
+        lifecycleScope.launch {
+            try {
+                // Pastikan kamu sudah menambahkan deleteCatatan di Repository (dari langkah sebelumnya)
+                val response = RetrofitClient.catatanRepository.deleteCatatan(id)
+
+                if (response.isSuccessful) {
+                    Toast.makeText(this@MainActivity, "Berhasil dihapus", Toast.LENGTH_SHORT).show()
+                    getDataCatatan() // Refresh data setelah menghapus
+                } else {
+                    Toast.makeText(this@MainActivity, "Gagal menghapus: ${response.code()}", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@MainActivity, "Error Jaringan: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -68,7 +117,7 @@ class MainActivity : AppCompatActivity() {
                         catatanAdapter.updateDataset(data)
                     }
                 } else {
-                    Toast.makeText(this@MainActivity, "Gagal: ${response.message()}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "Gagal mengambil data", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
